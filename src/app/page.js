@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import styles from "./page.module.css";
 import Notiflix from "notiflix";
+
 export default function Home() {
   const [data, setData] = useState([]);
   const [usersCount, setUsersCount] = useState("50");
@@ -9,6 +10,7 @@ export default function Home() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [userAddress, setUserAddress] = useState("");
   const [searchValue, setSearchValue] = useState("");
+  const [isOnline, setIsOnline] = useState("Online");
   const api = `https://pharmacy-api-5i0h.onrender.com/api/v1/users?limit=${usersCount}&keyword=${searchValue}`;
 
   useEffect(() => {
@@ -21,12 +23,28 @@ export default function Home() {
         console.error("Error fetching data:", error.message);
       }
     };
-
     fetchData();
   }, [api]);
-  useEffect(()=>{
-    Notiflix.Notify.info("Hello Doctors")
-  },[])
+
+  useEffect(() => {
+    const handleOnlineStatus = () => {
+      setIsOnline(navigator.onLine ? "Online" : "Offline");
+    };
+
+    handleOnlineStatus();
+    window.addEventListener("online", handleOnlineStatus);
+    window.addEventListener("offline", handleOnlineStatus);
+
+    return () => {
+      window.removeEventListener("online", handleOnlineStatus);
+      window.removeEventListener("offline", handleOnlineStatus);
+    };
+  }, []);
+
+  useEffect(() => {
+    // This useEffect runs only on the client side
+    setIsOnline("Online");
+  }, []); // Empty dependency array means it only runs once after the initial render on the client side
 
   const handleDelete = useCallback(
     async (userId) => {
@@ -90,7 +108,6 @@ export default function Home() {
       setUserAddress("");
     } catch (error) {
       console.error("Error adding a new user:", error.message);
-      // Confirm.show("Failed to add a new user", "OK");
       Notiflix.Notify.warning("Failed to add a new client", {
         position: "left-bottom",
       });
@@ -104,24 +121,9 @@ export default function Home() {
       setUsersCount(1);
     }
   };
-  // let [isOnline, setIsonline] = useState("Online");
-
-  const [isOnline, setIsOnline] = useState(
-    navigator.onLine ? "Online" : "Offline"
-  );
 
   useEffect(() => {
-    const handleOnlineStatus = () => {
-      setIsOnline(navigator.onLine ? "Online" : "Offline");
-    };
-
-    window.addEventListener("online", handleOnlineStatus);
-    window.addEventListener("offline", handleOnlineStatus);
-
-    return () => {
-      window.removeEventListener("online", handleOnlineStatus);
-      window.removeEventListener("offline", handleOnlineStatus);
-    };
+    Notiflix.Notify.info("Hello Doctors");
   }, []);
   return (
     <main className={styles.main}>
