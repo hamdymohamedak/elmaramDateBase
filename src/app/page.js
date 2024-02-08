@@ -1,217 +1,82 @@
-"use client";
-import React, { useEffect, useState, useCallback } from "react";
-import styles from "./page.module.css";
-import Notiflix from "notiflix";
-
-export default function Home() {
-  const [data, setData] = useState([]);
-  const [usersCount, setUsersCount] = useState("50");
-  const [userName, setUserName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [userAddress, setUserAddress] = useState("");
-  const [searchValue, setSearchValue] = useState("");
-  const [isOnline, setIsOnline] = useState("Online");
-  const api = `https://pharmacy-api-5i0h.onrender.com/api/v1/users?limit=${usersCount}&keyword=${searchValue}`;
+"use client"
+import React, { useState, useEffect } from "react";
+import Home from "./components/Home/page";
+export default function Page() {
+  const [isDesktop, setIsDesktop] = useState(true);
+  const [styling, setStyling] = useState("none");
+  const [userNameLogin, setUserNameLogin] = useState("");
+  const [passLogin, setPassLogin] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(api, { method: "GET" });
-        const json = await response.json();
-        setData(Array.isArray(json.data) ? json.data : []);
-      } catch (error) {
-        console.error("Error fetching data:", error.message);
-      }
-    };
-    fetchData();
-  }, [api]);
+    function handleResize() {
+      setIsDesktop(window.innerWidth > 700);
+    }
 
-  useEffect(() => {
-    const handleOnlineStatus = () => {
-      setIsOnline(navigator.onLine ? "Online" : "Offline");
-    };
+    window.addEventListener("resize", handleResize);
+    handleResize();
 
-    handleOnlineStatus();
-    window.addEventListener("online", handleOnlineStatus);
-    window.addEventListener("offline", handleOnlineStatus);
-
-    return () => {
-      window.removeEventListener("online", handleOnlineStatus);
-      window.removeEventListener("offline", handleOnlineStatus);
-    };
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  useEffect(() => {
-    // This useEffect runs only on the client side
-    setIsOnline("Online");
-  }, []); // Empty dependency array means it only runs once after the initial render on the client side
-
-  const handleDelete = useCallback(
-    async (userId) => {
-      try {
-        const response = await fetch(
-          `https://pharmacy-api-5i0h.onrender.com/api/v1/users/${userId}?sort=createdAt&keyword=${searchValue}`,
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to delete user");
-        }
-
-        setData((prevData) => prevData.filter((user) => user._id !== userId));
-        Notiflix.Notify.success("Client, Deleted", {
-          position: "left-bottom",
-        });
-      } catch (error) {
-        console.error("Error deleting user:", error.message);
-      }
-    },
-    [searchValue]
-  );
-
-  const handleName = (event) => setUserName(event.target.value);
-  const handlePhoneNumber = (event) => setPhoneNumber(event.target.value);
-  const handleAddress = (event) => setUserAddress(event.target.value);
-
-  const handleSearch = (event) => setSearchValue(event.target.value);
-
-  const handleAddNewUser = async () => {
-    try {
-      const response = await fetch(api, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: userName,
-          phone: phoneNumber,
-          address: userAddress,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add a new user");
-      }
-
-      const newUser = await response.json();
-      setData((prevData) => [...prevData, newUser]);
-      Notiflix.Notify.success("add successfully", {
-        position: "left-bottom",
-      });
-      setUserName("");
-      setPhoneNumber("");
-      setUserAddress("");
-    } catch (error) {
-      console.error("Error adding a new user:", error.message);
-      Notiflix.Notify.warning("Failed to add a new client", {
-        position: "left-bottom",
-      });
-    }
+  const handleInputs = () => {
+    setStyling("block");
   };
 
-  const handleUsersCount = (event) => {
-    const usersCountNumber = Number(event.target.value);
-    setUsersCount(usersCountNumber);
-    if (event < 0) {
-      setUsersCount(1);
-    }
+  const handleUserNameInputLogin = (event) => {
+    setUserNameLogin(event.target.value);
   };
 
-  useEffect(() => {
-    Notiflix.Notify.info("Hello Doctors");
-  }, []);
+  const handlePassInputLogin = (event) => {
+    setPassLogin(event.target.value);
+  };
+
+  if (typeof window !== "undefined") {
+    if (userNameLogin === "" || passLogin === "") {
+      setTimeout(() => {
+        window.close();
+      }, 5000);
+    }
+  }
+
+  if (userNameLogin === "hamdy" && passLogin === "180552") {
+    return <Home />;
+  } else {
+    // Handle incorrect username or password
+    // For example, show an error message or redirect to a login page
+    console.log("Incorrect username or password");
+  }
+
+  const loginStyle = {
+    fontSize: "25px",
+    fontWeight: "bold",
+    zIndex: "999",
+  };
+
+  const inputsLoginStyleing = {
+    display: styling,
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.h1}>El-Maram DateBase</div>
-
-      <div className={styles.isonline}>{isOnline}</div>
-
-      <div className={styles.formParent}>
-        <label>الاسم</label>
-        <input
-          onChange={handleName}
-          dir="rtl"
-          className={styles.inputs}
-          placeholder="الاسم..."
-          value={userName}
-        />
-        <label>الرقم </label>
-        <input
-          onChange={handlePhoneNumber}
-          dir="rtl"
-          className={styles.inputs}
-          placeholder="الرقم..."
-          value={phoneNumber}
-        />
-        <label>العنوان</label>
-        <input
-          onChange={handleAddress}
-          dir="rtl"
-          className={styles.inputs}
-          placeholder="العنوان..."
-          value={userAddress}
-        />
-        <button onClick={handleAddNewUser} className={styles.addBtn}>
-          اضافه
-        </button>
-      </div>
-      <input
-        type="number"
-        className={styles.userCount}
-        onChange={handleUsersCount}
-        placeholder="50"
-        value={usersCount}
-      />
-      <input
-        onChange={handleSearch}
-        dir="rtl"
-        placeholder="بحث..."
-        className={styles.search}
-      />
-      <div className={styles.clients}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>الاسم</th>
-              <th>العنوان</th>
-              <th>الرقم</th>
-              <th>ناريخ انضمام العميل</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.length === 0 ? (
-              <tr>
-                <td colSpan="5">loading...</td>
-              </tr>
-            ) : (
-              data.map((user) => (
-                <tr key={user._id} className={styles.tr}>
-                  <td className={styles.td}>{user.name}</td>
-                  <td className={styles.td}>{user.address}</td>
-                  <td className={styles.td}>{user.phone}</td>
-                  <td dir="rtl" className={styles.td}>
-                    {user.createdAt}
-                  </td>
-                  <td>
-                    <button
-                      className={styles.delBtn}
-                      onClick={() => handleDelete(user._id)}
-                    >
-                      delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-    </main>
+    <>
+      {isDesktop ? (
+        <Home />
+      ) : (
+        <div onClick={handleInputs} style={loginStyle}>
+          This website doesn t support mobile devices.
+          <input
+            onChange={handleUserNameInputLogin}
+            value={userNameLogin}
+            style={inputsLoginStyleing}
+            placeholder="user"
+          />
+          <input
+            onChange={handlePassInputLogin}
+            value={passLogin}
+            style={inputsLoginStyleing}
+            placeholder="pass"
+          />
+        </div>
+      )}
+    </>
   );
 }
