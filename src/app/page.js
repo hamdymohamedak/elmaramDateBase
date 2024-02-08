@@ -9,7 +9,7 @@ export default function Page() {
 
   useEffect(() => {
     function handleResize() {
-      setIsDesktop(window.innerWidth > 700);
+      setIsDesktop(window.innerWidth > 800);
     }
 
     window.addEventListener("resize", handleResize);
