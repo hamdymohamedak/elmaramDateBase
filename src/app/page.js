@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from "react";
 import Home from "./components/Home/page";
 export default function Page() {
@@ -29,14 +29,6 @@ export default function Page() {
   const handlePassInputLogin = (event) => {
     setPassLogin(event.target.value);
   };
-
-  if (typeof window !== "undefined") {
-    if (userNameLogin === "" || passLogin === "") {
-      setTimeout(() => {
-        window.close();
-      }, 20000);
-    }
-  }
 
   if (userNameLogin === "hamdy" && passLogin === "180552") {
     return <Home />;
