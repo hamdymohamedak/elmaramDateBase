@@ -1,95 +1,82 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client"
+import React, { useState, useEffect } from "react";
+import Home from "./components/Home/page";
+export default function Page() {
+  const [isDesktop, setIsDesktop] = useState(true);
+  const [styling, setStyling] = useState("none");
+  const [userNameLogin, setUserNameLogin] = useState("");
+  const [passLogin, setPassLogin] = useState("");
 
-export default function Home() {
+  useEffect(() => {
+    function handleResize() {
+      setIsDesktop(window.innerWidth > 700);
+    }
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const handleInputs = () => {
+    setStyling("block");
+  };
+
+  const handleUserNameInputLogin = (event) => {
+    setUserNameLogin(event.target.value);
+  };
+
+  const handlePassInputLogin = (event) => {
+    setPassLogin(event.target.value);
+  };
+
+  if (typeof window !== "undefined") {
+    if (userNameLogin === "" || passLogin === "") {
+      setTimeout(() => {
+        window.close();
+      }, 5000);
+    }
+  }
+
+  if (userNameLogin === "hamdy" && passLogin === "180552") {
+    return <Home />;
+  } else {
+    // Handle incorrect username or password
+    // For example, show an error message or redirect to a login page
+    console.log("Incorrect username or password");
+  }
+
+  const loginStyle = {
+    fontSize: "25px",
+    fontWeight: "bold",
+    zIndex: "999",
+  };
+
+  const inputsLoginStyleing = {
+    display: styling,
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <>
+      {isDesktop ? (
+        <Home />
+      ) : (
+        <div onClick={handleInputs} style={loginStyle}>
+          This website doesn t support mobile devices.
+          <input
+            onChange={handleUserNameInputLogin}
+            value={userNameLogin}
+            style={inputsLoginStyleing}
+            placeholder="user"
+          />
+          <input
+            onChange={handlePassInputLogin}
+            value={passLogin}
+            style={inputsLoginStyleing}
+            placeholder="pass"
+          />
         </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+      )}
+    </>
   );
 }
