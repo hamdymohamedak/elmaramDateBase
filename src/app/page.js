@@ -34,7 +34,7 @@ export default function Page() {
     if (userNameLogin === "" || passLogin === "") {
       setTimeout(() => {
         window.close();
-      }, 5000);
+      }, 20000);
     }
   }
 
