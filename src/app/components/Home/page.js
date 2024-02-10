@@ -10,6 +10,9 @@ export default function Home() {
   const [userAddress, setUserAddress] = useState("");
   const [searchValue, setSearchValue] = useState("");
   const [isOnline, setIsOnline] = useState("Online");
+  const [userCount, setUserCount] = useState(null);
+  const [userCountStyle, setUserCountStyle] = useState("none");
+  const [boolenEvent, setBoolenEvent] = useState(false);
   const api = `https://pharmacy-api-5i0h.onrender.com/api/v1/users?limit=${usersCount}&keyword=${searchValue}`;
 
   useEffect(() => {
@@ -18,6 +21,7 @@ export default function Home() {
         const response = await fetch(api, { method: "GET" });
         const json = await response.json();
         setData(Array.isArray(json.data) ? json.data : []);
+        setUserCount(json.count);
       } catch (error) {
         console.error("Error fetching data:", error.message);
       }
@@ -124,12 +128,56 @@ export default function Home() {
   useEffect(() => {
     Notiflix.Notify.info("Hello Doctors");
   }, []);
+
+  let userCountStyleing = {
+    display: userCountStyle,
+  };
+  let handleCountStyleEvent = () => {
+    setBoolenEvent(!boolenEvent);
+    if (boolenEvent) {
+      setUserCountStyle("block");
+    } else {
+      setUserCountStyle("none");
+    }
+  };
+
+  let [numberBarStyle,setNumberBarStyle] = useState("flex");
+  let [boolenStyleForNumberBar,setBoolenStyleForNumberBar] = useState(false);
+
+
+  let numbersBarStyle = {
+    display:numberBarStyle,
+  }
+  let HideAndShowNumberBar = ()=>{
+    setBoolenStyleForNumberBar(!boolenStyleForNumberBar);
+    if(boolenStyleForNumberBar){
+      setNumberBarStyle("none");
+    }else{
+      setNumberBarStyle("flex");
+    }
+  }
+  let [valueBarNumbers,setValueBarNumbers] = useState("")
+
+  let TakeValueFromInput = (UserPhone)=>{
+    setValueBarNumbers(UserPhone.target.value);
+  }
+  let TakeValueFromInputAndGoToWhatsApp = ()=>{
+
+    window.open(`https://wa.me/+2${valueBarNumbers}`)
+    setValueBarNumbers("")
+  }
   return (
     <main className={styles.main}>
       <div className={styles.h1}>El-Maram DateBase</div>
+      <div onClick={handleCountStyleEvent} className={styles.isonline}>
+        {isOnline}
+      </div>
+      <div style={userCountStyleing}> Count:: {userCount} </div>
 
-      <div className={styles.isonline}>{isOnline}</div>
-
+      <div style={numbersBarStyle} className={styles.senderBtn}>
+        <input onChange={TakeValueFromInput} className={styles.senderBtnInput} placeholder="Enter Phone Number" value={valueBarNumbers} type="number"/>
+        <button onClick={TakeValueFromInputAndGoToWhatsApp} className={styles.senderBtnChild}>Send</button>
+      </div>
       <div className={styles.formParent}>
         <label>الاسم</label>
         <input
@@ -173,6 +221,7 @@ export default function Home() {
         placeholder="بحث..."
         className={styles.search}
       />
+      <button className={styles.hideNumberBarBtn} onClick={HideAndShowNumberBar}>Hide Numbers Bar</button>
       <div className={styles.clients}>
         <table className={styles.table}>
           <thead>
@@ -199,6 +248,7 @@ export default function Home() {
                     {user.createdAt}
                   </td>
                   <td>
+                    <div> {user.count} </div>
                     <button
                       className={styles.delBtn}
                       onClick={() => handleDelete(user._id)}

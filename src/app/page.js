@@ -1,22 +1,12 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Home from "./components/Home/page";
+import { isDesktop } from "react-device-detect";
+
 export default function Page() {
-  const [isDesktop, setIsDesktop] = useState(true);
   const [styling, setStyling] = useState("none");
   const [userNameLogin, setUserNameLogin] = useState("");
   const [passLogin, setPassLogin] = useState("");
-
-  useEffect(() => {
-    function handleResize() {
-      setIsDesktop(window.innerWidth > 800);
-    }
-
-    window.addEventListener("resize", handleResize);
-    handleResize();
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   const handleInputs = () => {
     setStyling("block");
@@ -30,13 +20,16 @@ export default function Page() {
     setPassLogin(event.target.value);
   };
 
-  if (userNameLogin === "hamdy" && passLogin === "180552") {
-    return <Home />;
-  } else {
-    // Handle incorrect username or password
-    // For example, show an error message or redirect to a login page
-    console.log("Incorrect username or password");
-  }
+  // Check login credentials
+  useEffect(() => {
+    if (userNameLogin === "hamdy" && passLogin === "180552") {
+      return <Home />;
+    } else {
+      // Handle incorrect username or password
+      // For example, show an error message or redirect to a login page
+      console.log("Incorrect username or password");
+    }
+  }, []);
 
   const loginStyle = {
     fontSize: "25px",
@@ -49,7 +42,7 @@ export default function Page() {
   };
 
   return (
-    <>
+    <main>
       {isDesktop ? (
         <Home />
       ) : (
@@ -59,16 +52,17 @@ export default function Page() {
             onChange={handleUserNameInputLogin}
             value={userNameLogin}
             style={inputsLoginStyleing}
-            placeholder="user"
+            placeholder="Username"
           />
           <input
             onChange={handlePassInputLogin}
             value={passLogin}
             style={inputsLoginStyleing}
-            placeholder="pass"
+            placeholder="Password"
+            type="password"
           />
         </div>
       )}
-    </>
+    </main>
   );
 }
