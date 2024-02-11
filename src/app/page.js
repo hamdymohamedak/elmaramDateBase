@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import Home from "./components/Home/page";
+import Home from "./components/Homea;lsm;lasfl;masf;lm;lmaammaam;slmf;amsfas;lgmpasl[pasld[plaspdllllasdlhahaHomealsmlasfmasflmlmaammaamslmf/page";
 import { isDesktop } from "react-device-detect";
-
+import Login from "./components/login/page"
 export default function Page() {
   const [styling, setStyling] = useState("none");
   const [userNameLogin, setUserNameLogin] = useState("");
@@ -44,7 +44,7 @@ export default function Page() {
   return (
     <main>
       {isDesktop ? (
-        <Home />
+        <Login/>
       ) : (
         <div onClick={handleInputs} style={loginStyle}>
           This website doesn t support mobile devices.
